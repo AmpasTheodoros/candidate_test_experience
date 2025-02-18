@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -9,10 +12,9 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
 
-// Set up the PostgreSQL connection pool.
-// Replace 'your_neon_connection_string_here' with your actual Neon PostgreSQL connection string
+// Set up the PostgreSQL connection pool using the environment variable
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
 });
 
 // Login endpoint: validates user credentials using Neon PostgreSQL
@@ -22,8 +24,6 @@ app.post('/login', async (req, res) => {
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      // For demonstration, we're doing a plain text match.
-      // In production, store hashed passwords and compare using bcrypt.
       if (user.password === password) {
         res.json({ success: true, token: 'dummy-jwt-token' });
       } else {
