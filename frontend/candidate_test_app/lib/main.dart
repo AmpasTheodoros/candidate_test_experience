@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'video_test_page.dart'; // Import the video test page
 
 void main() {
   runApp(CandidateTestApp());
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
-    final url = Uri.parse("https://candidate.ampassador.com/login"); // Ensure this URL matches your backend endpoint
+    final url = Uri.parse("https://candidate.ampassador.com/login");
 
     try {
       final response = await http.post(
@@ -39,8 +40,12 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (response.statusCode == 200) {
-        // Navigate to the HomePage on successful login
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+        // After a successful login, navigate to the Home Screen.
+        // On the home screen, the candidate can see test instructions and then start the test.
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Login failed: Invalid credentials")),
@@ -60,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _usernameController,
@@ -72,8 +78,13 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _login,
-              child: Text('Login'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VideoTestPage()),
+                );
+              },
+              child: Text("Start Test"),
             ),
           ],
         ),
@@ -82,13 +93,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  // Test instructions from Appendix A
-  final String testInstructions = '''In each game you'll be playing a role. The character on the screen will engage you in an informal conversation. Your job is to listen and respond with your preferred choice. It is not a simple choice between right and wrong answers. The choices represent your preference concerning the subject of conversation.
-
-At every moment you should listen to what the character on the screen says and try to understand the meaning and intent. You will not have the ability to repeat any of the answers or the speech of the character. Even if you are not sure you understand, you must use your judgement to choose one of the proposed answers. You will always have two opportunities to play each game. Your score will be based on your answers in the second round of each game. You can view the first one as essentially as a trial round.
-
-The first dialogue is a demonstration game. It does not produce a score. Here's a tip: don’t try to be perfect. Choose the answers that seem to you the most natural, the most logical in the context and the best formulated.''';
+class HomeScreen extends StatelessWidget {
+  final String testInstructions = '''In each game you'll be playing a role. ... ''';
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +102,24 @@ The first dialogue is a demonstration game. It does not produce a score. Here's 
       appBar: AppBar(title: Text('Test Instructions')),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(child: Text(testInstructions)),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(child: Text(testInstructions)),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the video test page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VideoTestPage()),
+                );
+              },
+              child: Text("Start Test"),
+            ),
+          ],
+        ),
       ),
     );
   }
